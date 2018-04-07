@@ -32,6 +32,7 @@ cs_add_library(${PROJECT_NAME}
   src/ros_visualization.cpp
   src/trajectory_sampling.cpp
   src/yaml_io.cpp
+  src/test.cpp
 )
 # Link against yaml-cpp.
 target_link_libraries(${PROJECT_NAME} ${YamlCpp_LIBRARIES})
@@ -43,6 +44,11 @@ cs_add_executable(trajectory_sampler_node
   src/trajectory_sampler_node.cpp
 )
 target_link_libraries(trajectory_sampler_node ${PROJECT_NAME})
+
+cs_add_executable(testNode
+  src/test.cpp
+)
+target_link_libraries(testNode ${PROJECT_NAME})
 
 #########
 # TESTS #
