@@ -15,7 +15,9 @@ int main(int argc, char** argv)
     const int dimension = 4;
     const int derivative_to_optimize = mav_trajectory_generation::derivative_order::SNAP;
     mav_trajectory_generation::Vertex start(dimension), middle(dimension), end(dimension);
-
+    ros::Publisher startPub = n.advertise<visualization_msgs::Marker>( "start", 0 );
+    ros::Publisher goalPub = n.advertise<visualization_msgs::Marker>( "goal", 0 );
+    visualization_msgs::Marker startMarker, goalMarker;
     std::string line;
     std::ifstream waypointsFile("/home/sai/rrbt.txt");
     int lineNum = 0;
@@ -26,6 +28,24 @@ int main(int argc, char** argv)
         if (lineNum == 0) {
             start.makeStartOrEnd(Eigen::Vector4d(x, y, z, yaw), derivative_to_optimize);
             vertices.push_back(start);
+            startMarker.id = 0;
+            startMarker.type = visualization_msgs::Marker::SPHERE;
+            startMarker.action = visualization_msgs::Marker::ADD;
+            startMarker.pose.position.x = x;
+            startMarker.pose.position.y = y;
+            startMarker.pose.position.z = z;
+            startMarker.pose.orientation.x = 0.0;
+            startMarker.pose.orientation.y = 0.0;
+            startMarker.pose.orientation.z = 0.0;
+            startMarker.pose.orientation.w = 1.0;
+            startMarker.scale.x = 0.5;
+            startMarker.scale.y = 0.5;
+            startMarker.scale.z = 0.5;
+            startMarker.color.a = 1.0; // Don't forget to set the alpha!
+            startMarker.color.r = 0.0;
+            startMarker.color.g = 0.0;
+            startMarker.color.b = 1.0;
+            
         }
 
         else {
@@ -39,6 +59,24 @@ int main(int argc, char** argv)
 
     end.makeStartOrEnd(Eigen::Vector4d(4, 0, 0, 0), derivative_to_optimize);
     vertices.push_back(end);
+    goalMarker.id = 0;
+    goalMarker.type = visualization_msgs::Marker::SPHERE;
+    goalMarker.action = visualization_msgs::Marker::ADD;
+    goalMarker.pose.position.x = 4;
+    goalMarker.pose.position.y = 0;
+    goalMarker.pose.position.z = 0;
+    goalMarker.pose.orientation.x = 0.0;
+            goalMarker.pose.orientation.y = 0.0;
+            goalMarker.pose.orientation.z = 0.0;
+            goalMarker.pose.orientation.w = 1.0;
+            goalMarker.scale.x = 0.5;
+            goalMarker.scale.y = 0.5;
+            goalMarker.scale.z = 0.5;
+            goalMarker.color.a = 1.0; // Don't forget to set the alpha!
+            goalMarker.color.r = 0.0;
+            goalMarker.color.g = 1.0;
+            goalMarker.color.b = 0.0;
+            
 
     std::vector<double> segment_times;
     const double v_max = 2.0;
@@ -84,7 +122,12 @@ int main(int argc, char** argv)
         header.stamp = ros::Time::now();
         vis_pub.publish(markers);
         header.seq++;
-
+        startMarker.header.frame_id = "world";
+        startMarker.header.stamp = ros::Time::now();
+        goalMarker.header.frame_id = "world";
+        goalMarker.header.stamp = ros::Time::now();
+        startPub.publish(startMarker);
+        goalPub.publish(goalMarker);
         ros::Duration(5.0).sleep();
     }
 }
